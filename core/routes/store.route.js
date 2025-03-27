@@ -18,4 +18,9 @@ router.get("/:storeId/feedback", controller.getStoreFeedback); // Store feedback
 // POST METHODS
 router.post("/", verifyjwt, isAdmin, controller.createStore);
 
+// PATCH METHODS
+router.patch("/:storeId/details", verifyjwt, isAdmin, controller.updateStore);
+
+// DELETE METHODS
+router.delete("/:storeId", verifyjwt, isAdmin, controller.deleteStore);
 module.exports = router;
