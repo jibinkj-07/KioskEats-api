@@ -1,9 +1,11 @@
 const router = require("express").Router();
 const verifyjwt = require("../../lib/middleware/verifyjwt");
 const isAdmin = require("../../lib/middleware/isAdmin");
+const hasStoreAccess = require("../../lib/middleware/hasStoreAccess");
 const storeController = require("../../lib/controllers/store.controller");
 const menuController = require("../../lib/controllers/menu.controller");
 const categoryController = require("../../lib/controllers/category.controller");
+const orderController = require("../../lib/controllers/order.controller");
 
 // GET METHODS
 router.get("/", storeController.getAllStores); // All Stores details
@@ -13,19 +15,31 @@ router.get("/:storeId", storeController.getStore); // Store basic details
 router.get("/:storeId/status", storeController.getStoreStatus); // Store status
 router.get("/:storeId/menu", menuController.getMenuItems); // Store menuItems
 router.get("/:storeId/categories", categoryController.getCategories); // Store categories
-router.get("/:storeId/orders", verifyjwt, storeController.getStoreOrders); // Store orders
+router.get(
+  "/:storeId/orders",
+  verifyjwt,
+  hasStoreAccess,
+  orderController.getOrders
+); // Store orders
 router.get("/:storeId/offers", storeController.getStoreOffers); // Store offer
 router.get("/:storeId/feedback", storeController.getStoreFeedback); // Store feedback
 
 // POST METHODS
 router.post("/", verifyjwt, isAdmin, storeController.createStore);
-router.post("/:storeId/menu", verifyjwt, isAdmin, menuController.addMenuItem);
+router.post(
+  "/:storeId/menu",
+  verifyjwt,
+  hasStoreAccess,
+  menuController.addMenuItem
+);
 router.post(
   "/:storeId/categories",
   verifyjwt,
-  isAdmin,
+  hasStoreAccess,
   categoryController.addCategory
 );
+
+router.post("/:storeId/orders", orderController.addOrder); // Anyone can order
 
 // PATCH METHODS
 router.patch(
@@ -38,15 +52,21 @@ router.patch(
 router.patch(
   "/:storeId/menu/:itemId",
   verifyjwt,
-  isAdmin,
+  hasStoreAccess,
   menuController.updateMenuItem
 );
 
 router.patch(
   "/:storeId/categories/:categoryId",
   verifyjwt,
-  isAdmin,
+  hasStoreAccess,
   categoryController.updateCategory
+);
+router.patch(
+  "/:storeId/orders/:orderId",
+  verifyjwt,
+  hasStoreAccess,
+  storeController.updateStore
 );
 
 // DELETE METHODS
@@ -76,6 +96,19 @@ router.delete(
   verifyjwt,
   isAdmin,
   categoryController.deleteAllCategory
+);
+
+router.delete(
+  "/:storeId/orders/:orderId",
+  verifyjwt,
+  isAdmin,
+  orderController.deleteOrder
+);
+router.delete(
+  "/:storeId/orders",
+  verifyjwt,
+  isAdmin,
+  orderController.deleteAllOrders
 );
 
 module.exports = router;
