@@ -3,11 +3,13 @@ const verifyjwt = require("../../lib/middleware/verifyjwt");
 const isAdmin = require("../../lib/middleware/isAdmin");
 const hasStoreAccess = require("../../lib/middleware/hasStoreAccess");
 const hasOrderAccess = require("../../lib/middleware/hasOrderAccess");
+const hasFeedbackAccess = require("../../lib/middleware/hasFeedbackAccess");
 const storeController = require("../../lib/controllers/store.controller");
 const menuController = require("../../lib/controllers/menu.controller");
 const categoryController = require("../../lib/controllers/category.controller");
 const orderController = require("../../lib/controllers/order.controller");
 const offerController = require("../../lib/controllers/offer.controller");
+const feedbackController = require("../../lib/controllers/feedback.controller");
 
 // GET METHODS
 router.get("/", storeController.getAllStores); // All Stores details
@@ -24,7 +26,7 @@ router.get(
   orderController.getOrders
 ); // Store orders
 router.get("/:storeId/offers", offerController.getOffers); // Store offer
-router.get("/:storeId/feedback", storeController.getStoreFeedback); // Store feedback
+router.get("/:storeId/feedbacks", feedbackController.getFeedbacks); // Store feedback
 
 // POST METHODS
 router.post("/", verifyjwt, isAdmin, storeController.createStore);
@@ -43,6 +45,7 @@ router.post(
 
 router.post("/:storeId/orders", orderController.addOrder); // Anyone can order
 router.post("/:storeId/offers", verifyjwt, isAdmin, offerController.addOffer);
+router.post("/:storeId/feedbacks", feedbackController.addFeedback);
 
 // PATCH METHODS
 router.patch(
@@ -80,10 +83,22 @@ router.patch(
 );
 
 router.patch(
-  "/:storeId/stores",
+  "/:storeId/offers/:offerId",
   verifyjwt,
   isAdmin,
   offerController.updateOffer
+);
+router.patch(
+  "/:storeId/feedbacks/:feedbackId",
+  verifyjwt,
+  (req, res, next) => {
+    hasFeedbackAccess(req, res, (err) => {
+      if (!err) return next(); // If hasFeedbackAccess passes, continue
+
+      isAdmin(req, res, next); // Otherwise, check isAdmin
+    });
+  },
+  feedbackController.updateFeedback
 );
 
 // DELETE METHODS
@@ -146,6 +161,24 @@ router.delete(
   verifyjwt,
   isAdmin,
   offerController.deleteAllOffers
+);
+router.delete(
+  "/:storeId/feedbacks/:feedbackId",
+  verifyjwt,
+  (req, res, next) => {
+    hasFeedbackAccess(req, res, (err) => {
+      if (!err) return next(); // If hasFeedbackAccess passes, continue
+
+      isAdmin(req, res, next); // Otherwise, check isAdmin
+    });
+  },
+  feedbackController.deleteFeedback
+);
+router.delete(
+  "/:storeId/feedbacks",
+  verifyjwt,
+  isAdmin,
+  feedbackController.deleteAllFeedbacks
 );
 
 module.exports = router;
