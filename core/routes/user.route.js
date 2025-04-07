@@ -2,7 +2,8 @@ const router = require("express").Router();
 const userController = require("../../lib/controllers/user.controller");
 
 // GET METHODS
-router.get("/", userController.userData);
+router.get("/", userController.currentUserData);
+router.get("/:userId", userController.userData);
 router.get("/orders", userController.orders);
 router.get("/feedbacks", userController.feedbacks);
 

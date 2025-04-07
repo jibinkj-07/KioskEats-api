@@ -42,7 +42,7 @@ const updatePassword = async () => {
     token: token, // Token from URL parameter
     password: password,
   };
-  const url = `http://localhost:5000/api/auth/update-password`;
+  const url = `http://api.kioskeats.online/auth/update-password`;
   console.log(`url is ${url}`);
 
   try {
