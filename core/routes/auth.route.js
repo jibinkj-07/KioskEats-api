@@ -5,8 +5,6 @@ const path = require("path");
 const controller = require("../../lib/controllers/auth.controller");
 
 // GET METHODS
-router.get("/me", verifyjwt, controller.me);
-
 router.get("/reset-password", (req, res) => {
   res.sendFile(path.resolve(__dirname, "../../public/reset-password.html"));
 });
